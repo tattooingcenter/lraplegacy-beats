@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>承認 — L RAP LEGACY BEATS</title>
+<style>
+  :root{--bg:#0b0b0e;--panel:#141419;--panel2:#1c1c24;--line:#2a2a33;--ink:#f4f4f6;--sub:#a0a0ad;--accent:#c9a227;--accent2:#e7c454;--green:#3ad29f;--red:#e54848}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:36px 20px}
+  .logo{font-weight:900;letter-spacing:.12em;font-size:15px;text-align:center}.logo b{color:var(--accent2)}
+  h1{font-size:22px;font-weight:800;text-align:center;margin:6px 0 24px}
+  h2{font-size:15px;color:var(--sub);margin:26px 0 12px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:420px;margin:0 auto}
+  label{display:block;font-size:13px;color:var(--sub);margin:12px 0 6px}
+  input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:12px;font-size:15px}
+  .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#111;font-weight:800;padding:12px 20px;border-radius:999px;border:none;cursor:pointer;font-size:15px}
+  .row{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .play{width:40px;height:40px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;flex:none}
+  .meta{flex:1;min-width:0}.meta b{display:block}.meta span{color:var(--sub);font-size:12px}
+  .approve{background:transparent;border:1px solid var(--green);color:var(--green);border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:13px}
+  .reject{background:transparent;border:1px solid var(--red);color:#ff8a8a;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:13px}
+  .tag{font-size:11px;color:var(--accent2);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+  .muted{color:var(--sub);font-size:13px;text-align:center;margin-top:14px}
+  .err{color:#ff8a8a;text-align:center;margin-top:12px;display:none}
+  .hide{display:none}
+  a{color:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">L RAP LEGACY <b>BEATS</b></div>
+  <h1>承認・管理</h1>
+
+  <div class="card" id="loginCard">
+    <label>管理者の合言葉</label>
+    <input id="password" type="password" placeholder="管理者パスワード">
+    <div style="margin-top:16px;text-align:center"><button class="btn" onclick="login()">ログイン</button></div>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <div id="panel" class="hide">
+    <div class="muted"><a href="/staff-logout">ログアウト</a> ・ <a href="/upload.html">投稿画面へ</a></div>
+    <h2>承認待ち（<span id="pcount">0</span>）</h2>
+    <div id="pending"></div>
+    <h2>公開中（<span id="ccount">0</span>）</h2>
+    <div id="published"></div>
+  </div>
+  <audio id="player" style="width:100%;margin-top:16px;display:none" controls></audio>
+</div>
+
+<script>
+async function refresh(){
+  const s=await (await fetch('/api/staff-me')).json();
+  if(s.staff && s.role==='admin'){ document.getElementById('loginCard').classList.add('hide'); document.getElementById('panel').classList.remove('hide'); load(); }
+  else { document.getElementById('loginCard').classList.remove('hide'); document.getElementById('panel').classList.add('hide'); }
+}
+async function login(){
+  const password=document.getElementById('password').value;
+  const r=await fetch('/api/staff-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});
+  const d=await r.json();
+  if(r.ok && d.role==='admin'){ refresh(); }
+  else { const e=document.getElementById('loginErr'); e.textContent=d.role==='uploader'?'それは投稿者用の合言葉です。管理者パスワードを入れてください':(d.error||'エラー'); e.style.display='block'; }
+}
+function play(id){ const p=document.getElementById('player'); p.style.display='block'; p.src='/api/pending-preview/'+id; p.play(); }
+function rowHtml(b, pending){
+  return `<div class="row">
+    <div class="play" onclick="play('${b.id}')">▶</div>
+    <div class="meta"><b>${b.title}</b><span>${[b.genre,b.bpm?b.bpm+' BPM':'',b.key].filter(Boolean).join(' · ')} ／ by ${b.uploader||'?'}</span></div>
+    ${pending?`<button class="approve" onclick="approve('${b.id}')">公開する</button>`:'<span class="tag">公開中</span>'}
+    <button class="reject" onclick="del('${b.id}','${pending?'却下':'削除'}')">${pending?'却下':'削除'}</button>
+  </div>`;
+}
+async function load(){
+  const pending=await (await fetch('/api/pending')).json();
+  const all=await (await fetch('/api/all')).json();
+  const pub=all.filter(b=>b.status==='published');
+  document.getElementById('pcount').textContent=pending.length;
+  document.getElementById('ccount').textContent=pub.length;
+  document.getElementById('pending').innerHTML=pending.length?pending.map(b=>rowHtml(b,true)).join(''):'<div class="muted">承認待ちはありません</div>';
+  document.getElementById('published').innerHTML=pub.length?pub.map(b=>rowHtml(b,false)).join(''):'<div class="muted">まだ公開中のビートはありません</div>';
+}
+async function approve(id){ await fetch('/api/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}); load(); }
+async function del(id,word){ if(!confirm(word+'しますか？')) return; await fetch('/api/reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}); load(); }
+refresh();
+</script>
+</body>
+</html>

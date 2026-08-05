@@ -1,13 +1,16 @@
 {
   "name": "lraplegacy-beats",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "L RAP LEGACY BEATS - membership beat site",
+  "description": "L RAP LEGACY BEATS - membership beat site with multi-uploader",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
     "express": "^4.19.2",
+    "ffmpeg-static": "^5.2.0",
+    "multer": "^2.0.1",
     "stripe": "^16.12.0"
   }
 }

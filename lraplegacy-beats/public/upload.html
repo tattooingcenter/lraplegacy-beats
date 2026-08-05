@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ビート投稿 — L RAP LEGACY BEATS</title>
+<style>
+  :root{--bg:#0b0b0e;--panel:#141419;--line:#2a2a33;--ink:#f4f4f6;--sub:#a0a0ad;--accent:#c9a227;--accent2:#e7c454;--green:#3ad29f}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;line-height:1.7}
+  .wrap{max-width:560px;margin:0 auto;padding:40px 20px}
+  .logo{font-weight:900;letter-spacing:.12em;font-size:15px;text-align:center;margin-bottom:6px}
+  .logo b{color:var(--accent2)}
+  h1{font-size:22px;font-weight:800;text-align:center;margin-bottom:24px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px}
+  label{display:block;font-size:13px;color:var(--sub);margin:12px 0 6px}
+  input,select{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:12px;font-size:15px}
+  input[type=file]{padding:10px}
+  .row{display:flex;gap:10px}.row>div{flex:1}
+  .btn{width:100%;margin-top:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#111;font-weight:800;padding:14px;border-radius:999px;border:none;cursor:pointer;font-size:16px}
+  .btn:disabled{opacity:.5}
+  .muted{color:var(--sub);font-size:13px;text-align:center;margin-top:14px}
+  .msg{padding:12px;border-radius:10px;margin-top:14px;font-size:14px;text-align:center;display:none}
+  .ok{background:rgba(58,210,159,.12);border:1px solid var(--green);color:var(--green)}
+  .err{background:rgba(229,72,72,.12);border:1px solid #e54848;color:#ff8a8a}
+  .hide{display:none}
+  a{color:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">L RAP LEGACY <b>BEATS</b></div>
+  <h1>ビート投稿</h1>
+
+  <div class="card" id="loginCard">
+    <label>お名前（誰が上げたか記録に残ります）</label>
+    <input id="name" placeholder="例: YAMATO">
+    <label>チームの合言葉</label>
+    <input id="password" type="password" placeholder="合言葉">
+    <button class="btn" onclick="login()">ログイン</button>
+    <div class="msg err" id="loginErr"></div>
+  </div>
+
+  <div class="card hide" id="uploadCard">
+    <div class="muted" id="who"></div>
+    <label>ビートのmp3ファイル</label>
+    <input id="file" type="file" accept="audio/mpeg,.mp3">
+    <label>タイトル</label>
+    <input id="title" placeholder="例: NEON PULSE">
+    <div class="row">
+      <div><label>ジャンル</label><input id="genre" placeholder="Trap"></div>
+      <div><label>BPM</label><input id="bpm" type="number" placeholder="152"></div>
+      <div><label>キー</label><input id="key" placeholder="D major"></div>
+    </div>
+    <button class="btn" id="submitBtn" onclick="submitBeat()">投稿する（承認待ちになります）</button>
+    <div class="msg ok" id="okMsg"></div>
+    <div class="msg err" id="errMsg"></div>
+    <div class="muted" style="margin-top:16px"><a href="/staff-logout">ログアウト</a></div>
+  </div>
+
+  <div class="muted">投稿されたビートは、管理者が承認するとサイトに公開されます。<br>7秒の試聴クリップは自動で作られます。</div>
+</div>
+
+<script>
+async function refresh(){
+  const s = await (await fetch('/api/staff-me')).json();
+  if(s.staff){
+    document.getElementById('loginCard').classList.add('hide');
+    document.getElementById('uploadCard').classList.remove('hide');
+    document.getElementById('who').textContent = s.name + ' としてログイン中'+(s.role==='admin'?'（管理者）':'');
+  } else {
+    document.getElementById('loginCard').classList.remove('hide');
+    document.getElementById('uploadCard').classList.add('hide');
+  }
+}
+async function login(){
+  const name=document.getElementById('name').value, password=document.getElementById('password').value;
+  const r=await fetch('/api/staff-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,password})});
+  const d=await r.json();
+  if(r.ok){ refresh(); } else { const e=document.getElementById('loginErr'); e.textContent=d.error||'エラー'; e.style.display='block'; }
+}
+async function submitBeat(){
+  const f=document.getElementById('file').files[0];
+  const title=document.getElementById('title').value.trim();
+  const ok=document.getElementById('okMsg'), err=document.getElementById('errMsg'); ok.style.display='none'; err.style.display='none';
+  if(!f){ err.textContent='mp3ファイルを選んでください'; err.style.display='block'; return; }
+  if(!title){ err.textContent='タイトルを入力してください'; err.style.display='block'; return; }
+  const btn=document.getElementById('submitBtn'); btn.disabled=true; btn.textContent='アップロード中…（試聴を作成しています）';
+  const fd=new FormData();
+  fd.append('beat',f); fd.append('title',title);
+  fd.append('genre',document.getElementById('genre').value);
+  fd.append('bpm',document.getElementById('bpm').value);
+  fd.append('key',document.getElementById('key').value);
+  try{
+    const r=await fetch('/api/upload',{method:'POST',body:fd}); const d=await r.json();
+    if(r.ok){ ok.textContent='投稿しました！承認されると公開されます。'; ok.style.display='block';
+      document.getElementById('file').value=''; document.getElementById('title').value='';
+      document.getElementById('genre').value=''; document.getElementById('bpm').value=''; document.getElementById('key').value='';
+    } else { err.textContent=d.error||'エラー'; err.style.display='block'; }
+  }catch(e){ err.textContent='通信エラー'; err.style.display='block'; }
+  btn.disabled=false; btn.textContent='投稿する（承認待ちになります）';
+}
+refresh();
+</script>
+</body>
+</html>
