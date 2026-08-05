@@ -16,7 +16,7 @@ const APP_SECRET = process.env.APP_SECRET || 'dev-only-change-me';
 const PRICE_JPY = 2980;
 const LOOKUP_KEY = 'lraplegacy_monthly_2980';
 const DEV_FAKE = process.env.DEV_FAKE_STRIPE === '1'; // local testing without Stripe network
-const stripe = SECRET ? require('stripe')(SECRET) : null;
+const stripe = SECRET ? require('stripe')(SECRET, { apiVersion: '2025-03-31.basil' }) : null;
 
 const BEATS_DIR = path.join(__dirname, 'beats');
 const catalog = () => JSON.parse(fs.readFileSync(path.join(BEATS_DIR, 'catalog.json'), 'utf8'));
