@@ -121,7 +121,7 @@
   <div class="faq" id="faq"></div>
 </div></section>
 
-<footer>© L RAP LEGACY BEATS</footer>
+<footer>© L RAP LEGACY BEATS ・ <a id="tokushoLink" href="https://secret-acorn-5f5.notion.site/3b4c349c90d380c0af72dfb637d92488" target="_blank" rel="noopener" style="color:var(--accent2);text-decoration:none"></a></footer>
 
 <script>
 const I18N = {
@@ -152,6 +152,7 @@ const I18N = {
     faq:[['ダウンロードしたビートは商用利用できますか？','はい。会員期間中にDLしたビートは配信・ライブ・動画などに使えます（規約の範囲内）。'],
          ['ビートは毎月増えますか？','はい。毎月オリジナルビートを追加します。会員はすべて使い放題です。'],
          ['解約はできますか？','いつでも解約できます。創設メンバーの据え置き価格は継続中ずっと有効です。']],
+    tokusho:'特定商取引法に基づく表記',
     langlabel:'EN'
   },
   en: {
@@ -181,6 +182,7 @@ const I18N = {
     faq:[['Can I use downloaded beats commercially?','Yes. Beats you download while a member can be used for streaming, shows, and videos (per the terms).'],
          ['Do you add beats every month?','Yes. We add original beats every month, all unlimited for members.'],
          ['Can I cancel?','Anytime. Founding-member pricing stays locked as long as you keep your membership.']],
+    tokusho:'特定商取引法に基づく表記 (Japanese legal notice)',
     langlabel:'日本語'
   }
 };
@@ -195,6 +197,7 @@ function applyI18n(){
   document.getElementById('heroH1').innerHTML = t().hero_h1;
   document.getElementById('email').placeholder = t().email_ph;
   document.getElementById('langBtn').textContent = t().langlabel;
+  document.getElementById('tokushoLink').textContent = t().tokusho;
   if(PRICE_DISPLAY) document.getElementById('priceAmt').textContent = PRICE_DISPLAY;
   document.getElementById('faq').innerHTML = t().faq.map(([q,a])=>`<details><summary>${q}</summary><p>${a}</p></details>`).join('');
   renderAuth(); loadBeats();

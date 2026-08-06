@@ -66,6 +66,19 @@ function readCookie(req, name) {
 const currentMember = req => verifyToken(readCookie(req, 'lrl_member'));
 const currentStaff = req => verifyToken(readCookie(req, 'lrl_staff'));
 
+// ---- login throttling (per IP, in-memory) ----
+const _attempts = new Map();
+function throttle(req, res, key, maxPerMin = 8) {
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || (req.socket && req.socket.remoteAddress) || 'unknown';
+  const now = Date.now();
+  const id = key + ':' + ip;
+  const arr = (_attempts.get(id) || []).filter(t => now - t < 60000);
+  arr.push(now);
+  _attempts.set(id, arr);
+  if (arr.length > maxPerMin) { res.status(429).json({ error: '試行回数が多すぎます。少し時間をおいてからお試しください。 / Too many attempts. Please try again later.' }); return false; }
+  return true;
+}
+
 // ---- DB abstraction (Supabase table `beats` OR local json) ----
 function localReadDB() { try { return JSON.parse(fs.readFileSync(LOCAL_DB, 'utf8')); } catch { return []; } }
 function localWriteDB(rows) { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(LOCAL_DB, JSON.stringify(rows, null, 2)); }
@@ -215,6 +228,7 @@ app.get('/success', async (req, res) => {
 });
 app.post('/api/login', async (req, res) => {
   try {
+    if (!throttle(req, res, 'login')) return;
     const email = (req.body.email || '').trim().toLowerCase();
     if (!email) return res.status(400).json({ error: 'メールを入力してください' });
     if (await hasActiveSub(email)) { setCookie(res, 'lrl_member', { email }); return res.json({ ok: true }); }
@@ -225,6 +239,7 @@ app.get('/logout', (req, res) => { res.setHeader('Set-Cookie', 'lrl_member=; Htt
 
 // ================= staff (uploader / admin) =================
 app.post('/api/staff-login', (req, res) => {
+  if (!throttle(req, res, 'staff')) return;
   const pw = (req.body.password || '');
   const name = (req.body.name || '').trim().slice(0, 40);
   if (ADMIN_PASSWORD && pw === ADMIN_PASSWORD) { setCookie(res, 'lrl_staff', { role: 'admin', name: name || 'admin' }); return res.json({ ok: true, role: 'admin' }); }
