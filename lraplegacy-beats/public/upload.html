@@ -47,18 +47,55 @@
     <label>タイトル</label>
     <input id="title" placeholder="例: NEON PULSE">
     <div class="row">
-      <div><label>ジャンル</label><input id="genre" placeholder="Trap"></div>
-      <div><label>BPM</label><input id="bpm" type="number" placeholder="152"></div>
-      <div><label>キー</label><input id="key" placeholder="D major"></div>
+      <div><label>ジャンル（任意）</label>
+        <select id="genre">
+          <option value="">選択…</option>
+          <option>Trap</option><option>Boom Bap</option><option>Drill</option><option>Lo-Fi</option>
+          <option>Trap Soul</option><option>R&amp;B</option><option>Afrobeat</option><option>Jersey Club</option>
+          <option>Pop</option><option>その他</option>
+        </select>
+      </div>
+      <div><label>BPM（任意・自動）</label><input id="bpm" type="number" placeholder="自動判定"></div>
+      <div><label>キー（任意）</label>
+        <select id="key">
+          <option value="">選択…</option>
+          <option>C major</option><option>C# major</option><option>D major</option><option>D# major</option><option>E major</option><option>F major</option><option>F# major</option><option>G major</option><option>G# major</option><option>A major</option><option>A# major</option><option>B major</option>
+          <option>C minor</option><option>C# minor</option><option>D minor</option><option>D# minor</option><option>E minor</option><option>F minor</option><option>F# minor</option><option>G minor</option><option>G# minor</option><option>A minor</option><option>A# minor</option><option>B minor</option>
+        </select>
+      </div>
     </div>
+    <div class="muted" id="bpmStatus" style="text-align:left;margin-top:2px;min-height:18px"></div>
     <button class="btn" id="submitBtn" onclick="submitBeat()">投稿する（承認待ちになります）</button>
     <div class="msg ok" id="okMsg"></div>
     <div class="msg err" id="errMsg"></div>
     <div class="muted" style="margin-top:16px"><a href="/staff-logout">ログアウト</a></div>
   </div>
 
-  <div class="muted">投稿されたビートは、管理者が承認するとサイトに公開されます。<br>7秒の試聴クリップは自動で作られます。</div>
+  <div class="muted">必須はファイルとタイトルだけ。ジャンル・BPM・キーは任意で、BPMは選ぶと自動で判定します。<br>投稿されたビートは、管理者が承認するとサイトに公開されます。7秒の試聴クリップは自動で作られます。</div>
 </div>
+
+<script type="module">
+  // ブラウザ側でBPMを自動判定（サーバー負荷ゼロ）。失敗しても無視（BPMは任意）。
+  import { analyze } from 'https://esm.sh/web-audio-beat-detector@8';
+  const fileEl = document.getElementById('file');
+  const bpmEl = document.getElementById('bpm');
+  const statusEl = document.getElementById('bpmStatus');
+  fileEl.addEventListener('change', async () => {
+    const f = fileEl.files[0];
+    statusEl.textContent = '';
+    if (!f || bpmEl.value) return;
+    statusEl.textContent = 'BPMを自動判定中…';
+    try {
+      const buf = await f.arrayBuffer();
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const audio = await ctx.decodeAudioData(buf);
+      const tempo = await analyze(audio);
+      bpmEl.value = Math.round(tempo);
+      statusEl.textContent = 'BPM自動判定: ' + Math.round(tempo) + '（違っていれば直せます）';
+      ctx.close();
+    } catch (e) { statusEl.textContent = ''; }
+  });
+</script>
 
 <script>
 async function refresh(){
