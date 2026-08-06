@@ -175,8 +175,18 @@ app.get('/api/me', (req, res) => { const m = currentMember(req); res.json({ memb
 app.get('/api/catalog', async (req, res) => {
   try {
     const rows = await dbList('published');
-    res.json(rows.map(b => ({ id: b.id, title: b.title, genre: b.genre, bpm: b.bpm, key: b.key })));
+    res.json(rows.map(b => ({ id: b.id, title: b.title, genre: b.genre, bpm: b.bpm, key: b.key, type_beat: b.type_beat || null })));
   } catch (e) { console.error('catalog:', e.message); res.status(500).json([]); }
+});
+
+// Distinct list of "type beat" reference names already in use (for the upload form).
+app.get('/api/typebeats', async (req, res) => {
+  try {
+    const rows = await dbList();
+    const seen = new Set();
+    for (const b of rows) { const v = (b.type_beat || '').trim(); if (v) seen.add(v); }
+    res.json([...seen].sort((a, b) => a.localeCompare(b)));
+  } catch (e) { console.error('typebeats:', e.message); res.status(500).json([]); }
 });
 
 app.get('/api/preview/:id', async (req, res) => {
@@ -265,6 +275,7 @@ app.post('/api/upload', upload.single('beat'), async (req, res) => {
     const row = {
       id, title, genre: (req.body.genre || '').trim() || null,
       bpm: req.body.bpm ? parseInt(req.body.bpm, 10) : null, key: (req.body.key || '').trim() || null,
+      type_beat: (req.body.type_beat || '').trim().slice(0, 60) || null,
       file_path: `${id}.mp3`, preview_path: `${id}.mp3`,
       uploader: s.name, status: 'pending', created_at: new Date().toISOString(),
     };

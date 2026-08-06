@@ -38,6 +38,12 @@
   .price{max-width:440px;margin:0 auto;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--accent);border-radius:22px;padding:34px;text-align:center;position:relative;overflow:hidden}
   .price .founder{position:absolute;top:16px;right:-42px;transform:rotate(45deg);background:var(--yellow);color:#111;font-weight:800;font-size:12px;padding:6px 54px}
   .emblem{vertical-align:middle;margin-right:9px}
+  .playlists{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 16px}
+  .pl{background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:999px;padding:8px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s}
+  .pl:hover{color:var(--ink);border-color:var(--accent)}
+  .pl.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#062015;border-color:transparent}
+  .pl small{opacity:.7;font-weight:600;margin-left:5px}
+  .tb{color:var(--accent2);font-weight:700}
   .price .amt{font-size:50px;font-weight:900;margin:6px 0}.price .amt small{font-size:18px;color:var(--sub);font-weight:600}
   .price ul{list-style:none;text-align:left;margin:20px 0;display:inline-block}
   .price li{padding:6px 0;font-size:15px}.price li::before{content:"✓";color:var(--green);font-weight:900;margin-right:10px}
@@ -116,6 +122,7 @@
       <input id="email" type="email"><button class="btn btn-ghost" onclick="login()" data-i18n="login_btn"></button>
     </div>
   </div>
+  <div class="playlists" id="playlists"></div>
   <div class="beats" id="beatlist"></div>
   <audio id="player" style="width:100%;margin-top:14px;display:none" controls></audio>
 </div></section>
@@ -152,7 +159,7 @@ const I18N = {
     status_in:(e)=>'現在: <b>ログイン中</b> — '+e+' / DLできます',
     status_out:'現在: <b style="color:var(--sub)">未ログイン</b> — DLはロックされています',
     dl_member:'⬇ ダウンロード', dl_locked:'🔒 DLは会員限定', preview_ok:' · 試聴OK',
-    play_member:'再生', play_prev:'7秒 試聴',
+    play_member:'再生', play_prev:'7秒 試聴', all_label:'すべて',
     faq:[['ダウンロードしたビートは商用利用できますか？','はい。会員期間中にDLしたビートは配信・ライブ・動画などに使えます（規約の範囲内）。'],
          ['ビートは毎月増えますか？','はい。毎月オリジナルビートを追加します。会員はすべて使い放題です。'],
          ['解約はできますか？','いつでも解約できます。創設メンバーの据え置き価格は継続中ずっと有効です。']],
@@ -182,7 +189,7 @@ const I18N = {
     status_in:(e)=>'Signed in — <b>'+e+'</b> / downloads unlocked',
     status_out:'Not signed in — downloads are locked',
     dl_member:'⬇ Download', dl_locked:'🔒 Members only', preview_ok:' · Preview',
-    play_member:'Play', play_prev:'7-sec preview',
+    play_member:'Play', play_prev:'7-sec preview', all_label:'All',
     faq:[['Can I use downloaded beats commercially?','Yes. Beats you download while a member can be used for streaming, shows, and videos (per the terms).'],
          ['Do you add beats every month?','Yes. We add original beats every month, all unlimited for members.'],
          ['Can I cancel?','Anytime. Founding-member pricing stays locked as long as you keep your membership.']],
@@ -220,17 +227,40 @@ function renderAuth(){
     box.classList.remove('in'); st.innerHTML = t().status_out; loginrow.style.display='flex';
   }
 }
+let CATALOG=[]; let TYPE_FILTER=null;
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 async function loadBeats(){
-  const list=document.getElementById('beatlist');
-  let beats=[]; try{ beats=await (await fetch('/api/catalog')).json(); }catch(e){}
-  list.className='beats';
+  try{ CATALOG=await (await fetch('/api/catalog')).json(); }catch(e){ CATALOG=[]; }
+  if(TYPE_FILTER && !CATALOG.some(b=>b.type_beat===TYPE_FILTER)) TYPE_FILTER=null;
+  renderPlaylists(); renderBeatList();
+}
+function typeCounts(){
+  const m=new Map();
+  CATALOG.forEach(b=>{ if(b.type_beat){ m.set(b.type_beat,(m.get(b.type_beat)||0)+1); } });
+  return [...m.entries()].sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0]));
+}
+function renderPlaylists(){
+  const el=document.getElementById('playlists'); if(!el) return;
+  const counts=typeCounts();
+  if(!counts.length){ el.innerHTML=''; return; }
+  let html='<div class="pl'+(TYPE_FILTER===null?' active':'')+'" data-type="">'+t().all_label+' <small>'+CATALOG.length+'</small></div>';
+  html+=counts.map(([name,n])=>'<div class="pl'+(TYPE_FILTER===name?' active':'')+'" data-type="'+esc(name)+'">'+esc(name)+' type beat <small>'+n+'</small></div>').join('');
+  el.innerHTML=html;
+  el.onclick=e=>{ const c=e.target.closest('.pl'); if(!c)return; const ty=c.getAttribute('data-type'); TYPE_FILTER=ty===''?null:ty; renderPlaylists(); renderBeatList(); };
+}
+function renderBeatList(){
+  const list=document.getElementById('beatlist'); list.className='beats';
   const hint = ME.member ? '' : ('<span style="color:var(--yellow)">'+t().preview_ok+'</span>');
-  list.innerHTML = beats.map(b=>`
-    <div class="beatrow">
+  const beats = TYPE_FILTER===null ? CATALOG : CATALOG.filter(b=>b.type_beat===TYPE_FILTER);
+  list.innerHTML = beats.map(b=>{
+    const meta=[b.genre,b.bpm?b.bpm+' BPM':'',b.key].filter(Boolean).join(' · ');
+    const tb=b.type_beat?(' · <span class="tb">'+esc(b.type_beat)+' type beat</span>'):'';
+    return `<div class="beatrow">
       <div class="play" onclick="play('${b.id}')" title="${ME.member?t().play_member:t().play_prev}">▶</div>
-      <div class="beatmeta"><b>${b.title}</b><span>${[b.genre,b.bpm?b.bpm+' BPM':'',b.key].filter(Boolean).join(' · ')}${hint}</span></div>
+      <div class="beatmeta"><b>${esc(b.title)}</b><span>${meta}${tb}${hint}</span></div>
       <button class="dl" onclick="download('${b.id}')">${ME.member?t().dl_member:t().dl_locked}</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 async function join(){
   const btn=document.getElementById('joinbtn'); if(btn){btn.disabled=true;}

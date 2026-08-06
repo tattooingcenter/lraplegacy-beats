@@ -46,6 +46,12 @@
     <input id="file" type="file" accept="audio/mpeg,.mp3">
     <label>タイトル</label>
     <input id="title" placeholder="例: NEON PULSE">
+    <label>type beat（任意）</label>
+    <select id="typebeat" onchange="onTypeBeatChange()">
+      <option value="">指定なし</option>
+    </select>
+    <input id="typebeatNew" class="hide" style="margin-top:8px" placeholder="新しいtype beat名（例: Travis Scott）">
+    <div class="muted" style="text-align:left;margin-top:4px">「Travis Scott」を選ぶと、顧客側で "Travis Scott type beat" としてまとまります。無ければ「＋新しく追加」で登録。</div>
     <div class="row">
       <div><label>ジャンル（任意）</label>
         <select id="genre">
@@ -104,6 +110,7 @@ async function refresh(){
     document.getElementById('loginCard').classList.add('hide');
     document.getElementById('uploadCard').classList.remove('hide');
     document.getElementById('who').textContent = s.name + ' としてログイン中'+(s.role==='admin'?'（管理者）':'');
+    loadTypeBeats();
   } else {
     document.getElementById('loginCard').classList.remove('hide');
     document.getElementById('uploadCard').classList.add('hide');
@@ -115,6 +122,25 @@ async function login(){
   const d=await r.json();
   if(r.ok){ refresh(); } else { const e=document.getElementById('loginErr'); e.textContent=d.error||'エラー'; e.style.display='block'; }
 }
+const TYPEBEAT_SEED = ['Travis Scott','Playboi Carti','Central Cee','Juice WRLD','Drake','Lil Baby','Gunna','Ken Carson','Yeat','Metro Boomin','21 Savage','Don Toliver'];
+async function loadTypeBeats(){
+  let used=[]; try{ used=await (await fetch('/api/typebeats')).json(); }catch(e){}
+  const all=[...new Set([...(used||[]), ...TYPEBEAT_SEED])].sort((a,b)=>a.localeCompare(b));
+  const sel=document.getElementById('typebeat'); if(!sel) return;
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  sel.innerHTML='<option value="">指定なし</option>'
+    + all.map(n=>'<option value="'+esc(n)+'">'+esc(n)+' type beat</option>').join('')
+    + '<option value="__new__">＋ 新しく追加…</option>';
+}
+function onTypeBeatChange(){
+  const sel=document.getElementById('typebeat'), nw=document.getElementById('typebeatNew');
+  if(sel.value==='__new__'){ nw.classList.remove('hide'); nw.focus(); } else { nw.classList.add('hide'); }
+}
+function currentTypeBeat(){
+  const sel=document.getElementById('typebeat');
+  if(sel.value==='__new__') return document.getElementById('typebeatNew').value.trim();
+  return sel.value;
+}
 async function submitBeat(){
   const f=document.getElementById('file').files[0];
   const title=document.getElementById('title').value.trim();
@@ -124,6 +150,7 @@ async function submitBeat(){
   const btn=document.getElementById('submitBtn'); btn.disabled=true; btn.textContent='アップロード中…（試聴を作成しています）';
   const fd=new FormData();
   fd.append('beat',f); fd.append('title',title);
+  fd.append('type_beat',currentTypeBeat());
   fd.append('genre',document.getElementById('genre').value);
   fd.append('bpm',document.getElementById('bpm').value);
   fd.append('key',document.getElementById('key').value);
@@ -132,6 +159,8 @@ async function submitBeat(){
     if(r.ok){ ok.textContent='投稿しました！承認されると公開されます。'; ok.style.display='block';
       document.getElementById('file').value=''; document.getElementById('title').value='';
       document.getElementById('genre').value=''; document.getElementById('bpm').value=''; document.getElementById('key').value='';
+      const _nw=document.getElementById('typebeatNew'); _nw.value=''; _nw.classList.add('hide');
+      document.getElementById('typebeat').value=''; loadTypeBeats();
     } else { err.textContent=d.error||'エラー'; err.style.display='block'; }
   }catch(e){ err.textContent='通信エラー'; err.style.display='block'; }
   btn.disabled=false; btn.textContent='投稿する（承認待ちになります）';
