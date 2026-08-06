@@ -17,8 +17,13 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 
 const SECRET = process.env.STRIPE_SECRET_KEY || '';
 const PUBLISHABLE = process.env.STRIPE_PUBLISHABLE_KEY || '';
 const APP_SECRET = process.env.APP_SECRET || 'dev-only-change-me';
-const PRICE_JPY = 2980;
-const LOOKUP_KEY = 'lraplegacy_monthly_2980';
+// Region-based pricing: Japan pays JPY 2,980 / month; overseas pays USD 40 (~JPY 6,000) / month.
+const PRICES = {
+  jp:   { lookup: 'lraplegacy_monthly_2980',   unit_amount: 2980, currency: 'jpy', display: '¥2,980',
+          name: 'L RAP LEGACY BEATS 会員', desc: '日本語対応・ビート使い放題の月額メンバーシップ' },
+  intl: { lookup: 'lraplegacy_monthly_usd_40', unit_amount: 4000, currency: 'usd', display: '$40',
+          name: 'L RAP LEGACY BEATS — Membership', desc: 'Unlimited beats. Monthly membership. Commercial use OK.' },
+};
 const DEV_FAKE = process.env.DEV_FAKE_STRIPE === '1';
 const stripe = SECRET ? require('stripe')(SECRET, { apiVersion: '2025-03-31.basil' }) : null;
 
@@ -119,18 +124,20 @@ function makePreview(inputPath, outputPath) {
 }
 
 // ---- Stripe helpers ----
-let cachedPriceId = null;
-async function getPriceId() {
-  if (DEV_FAKE) return 'price_dev_fake';
-  if (cachedPriceId) return cachedPriceId;
-  const found = await stripe.prices.list({ lookup_keys: [LOOKUP_KEY], active: true, limit: 1 });
-  if (found.data.length) { cachedPriceId = found.data[0].id; return cachedPriceId; }
-  const product = await stripe.products.create({
-    name: 'L RAP LEGACY BEATS 会員', description: '日本語対応・ビート使い放題の月額メンバーシップ',
-    tax_code: 'txcd_10000000',
-  });
-  const price = await stripe.prices.create({ product: product.id, unit_amount: PRICE_JPY, currency: 'jpy', recurring: { interval: 'month' }, lookup_key: LOOKUP_KEY });
-  cachedPriceId = price.id; return cachedPriceId;
+const _priceCache = {};
+async function getPriceId(region) {
+  const cfg = PRICES[region] || PRICES.jp;
+  if (DEV_FAKE) return 'price_dev_fake_' + (region || 'jp');
+  if (_priceCache[region]) return _priceCache[region];
+  const found = await stripe.prices.list({ lookup_keys: [cfg.lookup], active: true, limit: 1 });
+  if (found.data.length) { _priceCache[region] = found.data[0].id; return found.data[0].id; }
+  const product = await stripe.products.create({ name: cfg.name, description: cfg.desc, tax_code: 'txcd_10000000' });
+  const price = await stripe.prices.create({ product: product.id, unit_amount: cfg.unit_amount, currency: cfg.currency, recurring: { interval: 'month' }, lookup_key: cfg.lookup });
+  _priceCache[region] = price.id; return price.id;
+}
+// Domestic (Japan) vs overseas, based on the browser's Accept-Language.
+function regionFromReq(req) {
+  return (req.headers['accept-language'] || '').trim().toLowerCase().startsWith('ja') ? 'jp' : 'intl';
 }
 async function hasActiveSub(email) {
   if (DEV_FAKE) return true;
@@ -146,7 +153,10 @@ async function hasActiveSub(email) {
 const baseUrl = req => process.env.BASE_URL || `${req.headers['x-forwarded-proto'] || req.protocol}://${req.headers.host}`;
 
 // ================= public catalog / playback =================
-app.get('/api/config', (req, res) => res.json({ publishableKey: PUBLISHABLE, price: PRICE_JPY }));
+app.get('/api/config', (req, res) => {
+  const region = regionFromReq(req);
+  res.json({ publishableKey: PUBLISHABLE, region, priceDisplay: PRICES[region].display });
+});
 app.get('/api/me', (req, res) => { const m = currentMember(req); res.json({ member: !!m, email: m ? m.email : null }); });
 
 app.get('/api/catalog', async (req, res) => {
@@ -185,9 +195,9 @@ app.get('/api/download/:id', (req, res) => serveFull(req, res, true));
 app.post('/api/checkout', async (req, res) => {
   try {
     if (DEV_FAKE) { setCookie(res, 'lrl_member', { email: 'devtester@example.com' }); return res.json({ url: baseUrl(req) + '/success?dev=1' }); }
-    const price = await getPriceId();
+    const price = await getPriceId(regionFromReq(req));
     const session = await stripe.checkout.sessions.create({
-      mode: 'subscription', line_items: [{ price, quantity: 1 }], allow_promotion_codes: true,
+      mode: 'subscription', line_items: [{ price, quantity: 1 }], allow_promotion_codes: true, locale: 'auto',
       success_url: baseUrl(req) + '/success?session_id={CHECKOUT_SESSION_ID}', cancel_url: baseUrl(req) + '/?canceled=1',
     });
     res.json({ url: session.url });
