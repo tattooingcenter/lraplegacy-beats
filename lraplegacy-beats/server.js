@@ -29,6 +29,8 @@ const stripe = SECRET ? require('stripe')(SECRET, { apiVersion: '2025-03-31.basi
 
 const UPLOAD_PASSWORD = process.env.UPLOAD_PASSWORD || '';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+// In-house producer names selectable at upload time (temporary until per-user logins).
+const PRODUCERS = (process.env.PRODUCERS || '京極,BlankO,baby,だいちん').split(',').map(s => s.trim()).filter(Boolean);
 
 // Supabase (prod). If unset, fall back to local disk (dev/test).
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -257,6 +259,7 @@ app.post('/api/staff-login', (req, res) => {
   res.status(403).json({ error: '合言葉が違います' });
 });
 app.get('/api/staff-me', (req, res) => { const s = currentStaff(req); res.json({ staff: !!s, role: s ? s.role : null, name: s ? s.name : null }); });
+app.get('/api/producers', (req, res) => { if (!currentStaff(req)) return res.status(401).json([]); res.json(PRODUCERS); });
 app.get('/staff-logout', (req, res) => { res.setHeader('Set-Cookie', 'lrl_staff=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax'); res.redirect('/upload.html'); });
 
 app.post('/api/upload', upload.single('beat'), async (req, res) => {
@@ -264,6 +267,8 @@ app.post('/api/upload', upload.single('beat'), async (req, res) => {
   if (!s) return res.status(401).json({ error: 'ログインしてください' });
   if (!req.file) return res.status(400).json({ error: 'mp3ファイルを選んでください' });
   const title = (req.body.title || '').trim(); if (!title) return res.status(400).json({ error: 'タイトルを入力してください' });
+  const pickedUploader = (req.body.uploader || '').trim();
+  const uploader = PRODUCERS.includes(pickedUploader) ? pickedUploader : s.name;
   const id = crypto.randomUUID();
   const tmpIn = path.join(os.tmpdir(), id + '.mp3');
   const tmpPrev = path.join(os.tmpdir(), id + '_p.mp3');
@@ -277,7 +282,7 @@ app.post('/api/upload', upload.single('beat'), async (req, res) => {
       bpm: req.body.bpm ? parseInt(req.body.bpm, 10) : null, key: (req.body.key || '').trim() || null,
       type_beat: (req.body.type_beat || '').trim().slice(0, 60) || null,
       file_path: `${id}.mp3`, preview_path: `${id}.mp3`,
-      uploader: s.name, status: 'pending', created_at: new Date().toISOString(),
+      uploader, status: 'pending', created_at: new Date().toISOString(),
     };
     await dbInsert(row);
     res.json({ ok: true });

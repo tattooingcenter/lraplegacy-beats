@@ -42,6 +42,8 @@
 
   <div class="card hide" id="uploadCard">
     <div class="muted" id="who"></div>
+    <label>投稿者（プロデューサー）</label>
+    <select id="uploader"><option value="">選択…</option></select>
     <label>ビートのmp3ファイル</label>
     <input id="file" type="file" accept="audio/mpeg,.mp3">
     <label>タイトル</label>
@@ -110,7 +112,7 @@ async function refresh(){
     document.getElementById('loginCard').classList.add('hide');
     document.getElementById('uploadCard').classList.remove('hide');
     document.getElementById('who').textContent = s.name + ' としてログイン中'+(s.role==='admin'?'（管理者）':'');
-    loadTypeBeats();
+    loadProducers(); loadTypeBeats();
   } else {
     document.getElementById('loginCard').classList.remove('hide');
     document.getElementById('uploadCard').classList.add('hide');
@@ -121,6 +123,14 @@ async function login(){
   const r=await fetch('/api/staff-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,password})});
   const d=await r.json();
   if(r.ok){ refresh(); } else { const e=document.getElementById('loginErr'); e.textContent=d.error||'エラー'; e.style.display='block'; }
+}
+async function loadProducers(){
+  let list=[]; try{ list=await (await fetch('/api/producers')).json(); }catch(e){}
+  const sel=document.getElementById('uploader'); if(!sel) return;
+  const cur=sel.value;
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  sel.innerHTML='<option value="">選択…</option>'+(list||[]).map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');
+  if(cur) sel.value=cur;
 }
 const TYPEBEAT_SEED = ['Travis Scott','Playboi Carti','Central Cee','Juice WRLD','Drake','Lil Baby','Gunna','Ken Carson','Yeat','Metro Boomin','21 Savage','Don Toliver'];
 async function loadTypeBeats(){
@@ -147,9 +157,12 @@ async function submitBeat(){
   const ok=document.getElementById('okMsg'), err=document.getElementById('errMsg'); ok.style.display='none'; err.style.display='none';
   if(!f){ err.textContent='mp3ファイルを選んでください'; err.style.display='block'; return; }
   if(!title){ err.textContent='タイトルを入力してください'; err.style.display='block'; return; }
+  const uploader=document.getElementById('uploader').value;
+  if(!uploader){ err.textContent='投稿者を選んでください'; err.style.display='block'; return; }
   const btn=document.getElementById('submitBtn'); btn.disabled=true; btn.textContent='アップロード中…（試聴を作成しています）';
   const fd=new FormData();
   fd.append('beat',f); fd.append('title',title);
+  fd.append('uploader',uploader);
   fd.append('type_beat',currentTypeBeat());
   fd.append('genre',document.getElementById('genre').value);
   fd.append('bpm',document.getElementById('bpm').value);
