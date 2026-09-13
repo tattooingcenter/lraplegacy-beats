@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>L RAP LEGACY BEATS</title>
+<link rel="icon" type="image/jpeg" href="logo.jpg">
+<link rel="apple-touch-icon" href="logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;800;900&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050806; --bg2:#070c09; --panel:#0d1410; --panel2:#121c16;
+    --line:#202c25; --line2:#2c3b32; --ink:#eef4f0; --sub:#8ba093; --dim:#5f6f66;
+    --accent:#2fbb74; --accent2:#5fe3a1; --gold:#e8c96a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+  .sora{font-family:"Sora","Noto Sans JP",system-ui,sans-serif}
+  svg.i{width:1em;height:1em;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.14em;flex:none}
+
+  .btn{display:inline-flex;align-items:center;gap:9px;white-space:nowrap;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04160d;font-weight:800;padding:14px 26px;border-radius:12px;border:none;cursor:pointer;font-size:15px;transition:transform .12s,box-shadow .2s;box-shadow:0 8px 30px -12px rgba(47,187,116,.7)}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 14px 36px -12px rgba(47,187,116,.8)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn-ghost{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;background:rgba(255,255,255,.02);border:1px solid var(--line2);color:var(--ink);font-weight:700;padding:13px 22px;border-radius:12px;cursor:pointer;font-size:15px;transition:.15s}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent2)}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.12em;color:var(--accent2);background:rgba(47,187,116,.08);border:1px solid rgba(47,187,116,.25);border-radius:999px;padding:6px 14px;font-weight:700}
+
+  header{position:sticky;top:0;z-index:20;background:rgba(5,8,6,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:62px;gap:10px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.1em;font-size:13px}
+  .logo span{white-space:nowrap}
+  .logo b{color:var(--accent2)}
+  .logomark{width:32px;height:32px;border-radius:9px;object-fit:cover;display:block;box-shadow:0 0 0 1px var(--line),0 4px 14px -6px rgba(47,187,116,.5)}
+  .navright{display:flex;align-items:center;gap:7px}
+  .navright .btn-ghost{padding:9px 13px;font-size:13px}
+  @media(max-width:400px){ .logo span{display:none} }
+  .langtoggle{background:transparent;border:1px solid var(--line2);color:var(--sub);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap}
+  .langtoggle:hover{color:var(--ink)}
+
+  .hero{position:relative;padding:86px 0 58px;text-align:center;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:-40% 0 auto 0;height:560px;background:radial-gradient(760px 340px at 50% 0%,rgba(47,187,116,.22),transparent 70%);pointer-events:none}
+  .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 120%,rgba(95,227,161,.06),transparent 55%);pointer-events:none}
+  .hero .inner{position:relative;z-index:1}
+  .hero h1{font-size:clamp(34px,6.4vw,62px);font-weight:800;line-height:1.12;letter-spacing:.005em}
+  .hero h1 span{background:linear-gradient(120deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero p{color:var(--sub);font-size:clamp(15px,2.4vw,18px);margin:20px auto 0;max-width:560px}
+  .cta{margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .trust{margin-top:30px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+  section{padding:56px 0;position:relative}
+  .eyebrow{display:block;text-align:center;color:var(--accent2);font-weight:800;letter-spacing:.18em;font-size:12px;margin-bottom:12px}
+  .h2{font-size:clamp(24px,4vw,30px);font-weight:800;text-align:center;letter-spacing:.01em}
+  .lead{color:var(--sub);text-align:center;max-width:560px;margin:12px auto 34px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:26px 24px;transition:.2s}
+  .card:hover{border-color:var(--line2);transform:translateY(-3px)}
+  .card .ic{display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:rgba(47,187,116,.12);color:var(--accent2);font-size:22px;margin-bottom:16px}
+  .card h3{font-size:16px;margin-bottom:7px;font-weight:800}
+  .card p{color:var(--sub);font-size:14px}
+
+  .price{max-width:460px;margin:0 auto;background:
+      radial-gradient(400px 200px at 100% 0%,rgba(232,201,106,.10),transparent 70%),
+      linear-gradient(165deg,var(--panel2),var(--panel));
+    border:1px solid var(--line2);border-radius:24px;padding:36px 32px;text-align:center;position:relative;overflow:hidden}
+  .price .founder{position:absolute;top:20px;right:-46px;transform:rotate(45deg);background:linear-gradient(90deg,var(--gold),#f2dd8f);color:#20160a;font-weight:800;font-size:11px;letter-spacing:.14em;padding:7px 58px;box-shadow:0 6px 18px -8px rgba(0,0,0,.6)}
+  .price .amt{font-size:56px;font-weight:800;margin:10px 0 2px;letter-spacing:-.01em}
+  .price .amt small{font-size:17px;color:var(--sub);font-weight:600;letter-spacing:0}
+  .price ul{list-style:none;text-align:left;margin:22px auto;display:inline-block}
+  .price li{padding:8px 0;font-size:15px;display:flex;align-items:flex-start;gap:11px}
+  .price li .ck{color:var(--accent2);font-size:18px;margin-top:2px;flex:none}
+  .price .pbtn{margin-top:6px}
+  .price .note{font-size:12.5px;color:var(--dim);margin-top:14px}
+
+  /* ===== member library (BeatStars-style) ===== */
+  .memberbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+  .memberbar .status{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:8px}
+  .memberbar .status b{color:var(--accent2)}
+  .memberbar .status .dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
+  .memberbar .status.in .dot{background:var(--accent2);box-shadow:0 0 0 4px rgba(95,227,161,.15)}
+  .loginrow{display:flex;gap:8px;flex-wrap:wrap}
+  .loginrow input{background:var(--bg2);border:1px solid var(--line2);color:var(--ink);border-radius:11px;padding:11px 15px;font-size:14px;min-width:210px;outline:none}
+  .loginrow input:focus{border-color:var(--accent)}
+
+  .searchrow{position:relative;margin:0 0 14px}
+  .searchrow .si{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:18px;pointer-events:none}
+  .searchrow input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:13px;padding:14px 44px 14px 44px;font-size:15px;outline:none;transition:.15s}
+  .searchrow input:focus{border-color:var(--accent);background:var(--panel2)}
+  .searchrow .clr{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--dim);background:none;border:none;cursor:pointer;font-size:17px;display:none}
+  .searchrow .clr.show{display:block}
+
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+  .pl{background:var(--panel);border:1px solid var(--line);color:var(--sub);border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s}
+  .pl:hover{color:var(--ink);border-color:var(--line2)}
+  .pl.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04160d;border-color:transparent}
+  .pl small{opacity:.7;font-weight:700;margin-left:6px}
+
+  .beats{display:flex;flex-direction:column;gap:8px}
+  .beatrow{display:flex;align-items:center;gap:14px;padding:11px 13px;background:var(--panel);border:1px solid var(--line);border-radius:14px;transition:.15s;cursor:pointer}
+  .beatrow:hover{border-color:var(--line2);background:var(--panel2)}
+  .beatrow.active{border-color:var(--accent)}
+  .art{width:54px;height:54px;border-radius:11px;flex:none;position:relative;display:grid;place-items:center;overflow:hidden;color:#fff}
+  .art .pic{position:absolute;inset:0;display:grid;place-items:center;font-size:19px;opacity:.85}
+  .art .ov{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.42);color:#fff;font-size:20px;opacity:0;transition:.15s;border:none;cursor:pointer}
+  .beatrow:hover .art .ov{opacity:1}
+  .art.playing .ov{opacity:1;background:rgba(0,0,0,.5);color:var(--accent2)}
+  .beatmeta{flex:1;min-width:0}
+  .beatmeta b{display:block;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .beatmeta .sub{color:var(--sub);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .beatmeta .tb{color:var(--accent2);font-weight:700}
+  .beatmeta .prev{color:var(--gold);font-weight:700}
+  .rowbtns{display:flex;align-items:center;gap:8px;flex:none}
+  .dl{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--accent2);border:1px solid var(--line2);border-radius:10px;padding:9px 15px;cursor:pointer;white-space:nowrap;background:transparent;transition:.15s}
+  .dl:hover{border-color:var(--accent);background:rgba(47,187,116,.08)}
+  .dl.locked{color:var(--dim)}
+  .dl .lbl{display:inline}
+  @media(max-width:520px){ .dl .lbl{display:none} .dl{padding:10px} }
+  .emptybeats{text-align:center;color:var(--dim);padding:44px 0;font-size:14px}
+  #player{display:none}
+  body.has-player #member{padding-bottom:96px}
+
+  /* ===== bottom player bar ===== */
+  .playerbar{position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(9,14,11,.97);backdrop-filter:blur(16px);border-top:1px solid var(--line2);padding:11px 14px calc(11px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:13px;transform:translateY(120%);transition:transform .25s}
+  body.has-player .playerbar{transform:none}
+  .playerbar .seek{position:absolute;top:0;left:0;right:0;height:4px;background:var(--line);cursor:pointer}
+  .playerbar .seek .fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .playerbar .seek .knob{display:none}
+  .pbart{width:46px;height:46px;border-radius:9px;flex:none;overflow:hidden;position:relative;display:grid;place-items:center;color:#fff;cursor:pointer}
+  .pbart .pic{font-size:17px;opacity:.85}
+  .pbinfo{flex:1;min-width:0;cursor:pointer}
+  .pbinfo b{display:block;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pbinfo .sub{color:var(--sub);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pbtime{color:var(--dim);font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none}
+  .pbplay{width:44px;height:44px;border-radius:50%;flex:none;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04160d;display:grid;place-items:center;font-size:19px}
+  .pbico{background:none;border:none;color:var(--sub);cursor:pointer;font-size:19px;flex:none;padding:4px}
+  .pbico:hover{color:var(--ink)}
+  @media(max-width:520px){ .pbtime{display:none} }
+
+  /* ===== track detail (full screen) ===== */
+  .detail{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .28s;display:none}
+  .detail.open{display:block;transform:none}
+  .dhead{position:sticky;top:0;background:rgba(5,8,6,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);height:56px;display:flex;align-items:center;gap:12px;padding:0 16px}
+  .dback{background:none;border:none;color:var(--ink);cursor:pointer;font-size:22px;display:grid;place-items:center;padding:4px}
+  .dhead .dh-title{font-weight:800;font-size:14px;color:var(--sub);letter-spacing:.04em}
+  .dbody{max-width:560px;margin:0 auto;padding:26px 22px 120px}
+  .dart{width:100%;max-width:300px;aspect-ratio:1;border-radius:20px;margin:0 auto 22px;display:grid;place-items:center;color:#fff;font-size:56px;box-shadow:0 24px 60px -24px rgba(0,0,0,.8);overflow:hidden}
+  .dtitle{font-size:26px;font-weight:800;text-align:center;letter-spacing:.01em}
+  .dprod{color:var(--sub);text-align:center;margin-top:4px;font-size:14px}
+  .dtags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:18px 0 4px}
+  .dtag{font-size:12px;font-weight:700;color:var(--sub);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+  .dtag.accent{color:var(--accent2);border-color:rgba(47,187,116,.3);background:rgba(47,187,116,.08)}
+  .wave{display:flex;align-items:center;gap:2px;height:66px;margin:24px 0 8px;cursor:pointer}
+  .wave .bar{flex:1;background:var(--line2);border-radius:2px;transition:background .05s}
+  .wave .bar.on{background:linear-gradient(180deg,var(--accent2),var(--accent))}
+  .dtime{display:flex;justify-content:space-between;color:var(--dim);font-size:12px;font-variant-numeric:tabular-nums;margin-bottom:22px}
+  .dactions{display:flex;gap:12px;align-items:center;justify-content:center}
+  .dplay{width:64px;height:64px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04160d;display:grid;place-items:center;font-size:26px;box-shadow:0 12px 30px -10px rgba(47,187,116,.7)}
+  .dnote{color:var(--dim);font-size:12.5px;text-align:center;margin-top:18px}
+
+  .faq{max-width:660px;margin:0 auto}
+  .faq details{border:1px solid var(--line);border-radius:14px;padding:2px 18px;margin-bottom:10px;background:var(--panel)}
+  .faq summary{cursor:pointer;font-weight:700;font-size:15px;list-style:none;padding:15px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary .pm{color:var(--accent2);transition:.2s}
+  .faq details[open] summary .pm{transform:rotate(45deg)}
+  .faq p{color:var(--sub);font-size:14px;padding:0 0 16px}
+
+  footer{border-top:1px solid var(--line);padding:30px 0;text-align:center;color:var(--dim);font-size:13px}
+  footer a{color:var(--sub);text-decoration:none}
+  footer a:hover{color:var(--accent2)}
+
+  body.is-app .app-hide{display:none!important}
+  .app-only{display:none}
+  body.is-app .app-only{display:block}
+  body.is-member .member-hide{display:none!important}
+  body.is-member #member{padding-top:26px}
+
+  @media(max-width:760px){
+    .grid{grid-template-columns:1fr}
+    .hero{padding:64px 0 44px}
+    section{padding:44px 0}
+    .memberbar{align-items:stretch}
+    .loginrow input{flex:1;min-width:0}
+  }
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <div class="logo">
+    <img src="logo.jpg" class="logomark" width="32" height="32" alt="L RAP LEGACY BEATS">
+    <span>L RAP LEGACY <b>BEATS</b></span>
+  </div>
+  <div class="navright">
+    <button class="langtoggle" id="langBtn" onclick="toggleLang()"></button>
+    <div id="navauth"></div>
+  </div>
+</div></header>
+
+<!-- HERO -->
+<section class="hero member-hide"><div class="wrap inner">
+  <div class="chip" id="heroChip"></div>
+  <h1 id="heroH1" style="margin-top:18px"></h1>
+  <p data-i18n="hero_p"></p>
+  <div class="cta">
+    <button class="btn" onclick="join()"><span data-i18n="cta_join"></span></button>
+    <button class="btn-ghost" onclick="go('member')"><span data-i18n="cta_view"></span></button>
+  </div>
+  <div class="app-only" style="margin-top:14px;color:var(--dim);font-size:12.5px" data-i18n="app_note"></div>
+  <div class="trust">
+    <span class="chip" data-i18n="badge1"></span><span class="chip" data-i18n="badge2"></span><span class="chip" data-i18n="badge3"></span>
+  </div>
+</div></section>
+
+<!-- REASONS -->
+<section class="app-hide member-hide"><div class="wrap">
+  <span class="eyebrow" data-i18n="reasons_eyebrow"></span>
+  <div class="h2" data-i18n="reasons_title"></div>
+  <div class="lead" data-i18n="reasons_lead"></div>
+  <div class="grid">
+    <div class="card"><div class="ic" data-icon="target"></div><h3 data-i18n="card1_h"></h3><p data-i18n="card1_p"></p></div>
+    <div class="card"><div class="ic" data-icon="infinity"></div><h3 data-i18n="card2_h"></h3><p data-i18n="card2_p"></p></div>
+    <div class="card"><div class="ic" data-icon="briefcase"></div><h3 data-i18n="card3_h"></h3><p data-i18n="card3_p"></p></div>
+  </div>
+</div></section>
+
+<!-- PRICING -->
+<section id="join" class="app-hide member-hide"><div class="wrap">
+  <span class="eyebrow" data-i18n="join_eyebrow"></span>
+  <div class="h2" data-i18n="join_title"></div>
+  <div class="lead" data-i18n="join_lead"></div>
+  <div class="price">
+    <div class="founder">FOUNDER</div>
+    <div class="chip" data-i18n="price_tag"></div>
+    <div class="amt"><span id="priceAmt">—</span><small data-i18n="price_per"></small></div>
+    <ul id="featlist"></ul>
+    <div class="pbtn"><button class="btn" id="joinbtn" onclick="join()"><span data-i18n="price_btn"></span></button></div>
+    <div class="note" data-i18n="price_note"></div>
+  </div>
+</div></section>
+
+<!-- MEMBER LIBRARY -->
+<section id="member"><div class="wrap">
+  <span class="eyebrow member-hide" data-i18n="member_eyebrow"></span>
+  <div class="h2 member-hide" data-i18n="member_title"></div>
+  <div class="lead member-hide" data-i18n="member_lead"></div>
+  <div class="memberbar member-hide">
+    <div class="status" id="statusText"></div>
+    <div class="loginrow" id="loginrow" style="display:none">
+      <input id="email" type="email" autocomplete="email"><button class="btn-ghost" onclick="login()"><span data-i18n="login_btn"></span></button>
+    </div>
+  </div>
+  <div class="searchrow">
+    <span class="si" id="searchIcon"></span>
+    <input id="search" type="text" oninput="onSearch(this.value)" autocomplete="off">
+    <button class="clr" id="searchClr" onclick="clearSearch()"></button>
+  </div>
+  <div class="filters" id="playlists"></div>
+  <div class="beats" id="beatlist"></div>
+  <audio id="player" preload="metadata"></audio>
+</div></section>
+
+<!-- FAQ -->
+<section class="app-hide member-hide"><div class="wrap">
+  <span class="eyebrow" data-i18n="faq_eyebrow"></span>
+  <div class="h2" data-i18n="faq_title"></div>
+  <div class="faq" id="faq" style="margin-top:26px"></div>
+</div></section>
+
+<footer class="member-hide">© L RAP LEGACY BEATS ・ <a id="tokushoLink" href="https://secret-acorn-5f5.notion.site/3b4c349c90d380c0af72dfb637d92488" target="_blank" rel="noopener"></a></footer>
+
+<!-- BOTTOM PLAYER BAR -->
+<div class="playerbar" id="playerbar" aria-hidden="true">
+  <div class="seek" id="seek" onclick="seekAt(event)"><div class="fill" id="seekFill"></div></div>
+  <div class="pbart" id="pbArt" onclick="openDetail(CURRENT)"><span class="pic" id="pbArtPic"></span></div>
+  <div class="pbinfo" onclick="openDetail(CURRENT)"><b id="pbTitle"></b><div class="sub" id="pbSub"></div></div>
+  <span class="pbtime" id="pbTime">0:00</span>
+  <button class="pbplay" id="pbPlay" onclick="togglePlay()"></button>
+</div>
+
+<!-- TRACK DETAIL -->
+<div class="detail" id="detail" aria-hidden="true">
+  <div class="dhead">
+    <button class="dback" onclick="closeDetail()" id="dBack"></button>
+    <span class="dh-title" id="dHeadTitle"></span>
+  </div>
+  <div class="dbody">
+    <div class="dart" id="dArt"><span id="dArtPic"></span></div>
+    <div class="dtitle" id="dTitle"></div>
+    <div class="dprod" id="dProd"></div>
+    <div class="dtags" id="dTags"></div>
+    <div class="wave" id="wave" onclick="seekAt(event)"></div>
+    <div class="dtime"><span id="dCur">0:00</span><span id="dDur">0:00</span></div>
+    <div class="dactions">
+      <button class="dplay" id="dPlay" onclick="detailPlay()"></button>
+      <button class="dl" id="dDl" onclick="download(DETAIL)"></button>
+    </div>
+    <div class="dnote" id="dNote"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- Lucide-style inline icons ---------- */
+const ICONS = {
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  infinity:'<path d="M12 12c-2-2.7-4-4-6-4a4 4 0 0 0 0 8c2 0 4-1.3 6-4Zm0 0c2 2.7 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.3-6 4Z"/>',
+  briefcase:'<rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  play:'<polygon points="6 3 20 12 6 21 6 3"/>',
+  pause:'<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+  lock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  music:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  headphones:'<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+  external:'<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+  plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  back:'<path d="m15 18-6-6 6-6"/>',
+  sparkles:'<path d="M9.94 14.66A2 2 0 0 1 8 16a2 2 0 0 1 1.94 1.34l.5 1.4a.5.5 0 0 0 .94 0l.5-1.4A2 2 0 0 1 14 16a2 2 0 0 1-1.94-1.34l-.5-1.4a.5.5 0 0 0-.94 0Z"/><path d="M18 5.5 18.4 6.7a2 2 0 0 0 1.3 1.3l1.2.4-1.2.4a2 2 0 0 0-1.3 1.3L18 11.5l-.4-1.4a2 2 0 0 0-1.3-1.3L15 8.4l1.3-.4a2 2 0 0 0 1.3-1.3Z"/>'
+};
+function icon(name,cls){ return '<svg class="i '+(cls||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[name]||'')+'</svg>'; }
+
+/* ---------- app mode ---------- */
+const IS_APP = new URLSearchParams(location.search).has('app');
+if(IS_APP) document.body.classList.add('is-app');
+const RN = () => (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage==='function');
+function openExternal(url){ if(RN()){ window.ReactNativeWebView.postMessage(JSON.stringify({type:'external',url:url})); return true; } return false; }
+
+/* ---------- i18n ---------- */
+const I18N = {
+  ja: {
+    badge:'日本語対応・商用利用OK',
+    hero_h1:'日本のシーンのための<br><span>ビート、使い放題。</span>',
+    hero_p:'毎月追加されるオリジナルビートを、会員だけがダウンロード。1曲ずつ買う時代は終わり。月額で、好きなだけ。',
+    cta_join:'創設メンバーになる', cta_view:'ビートを聴く',
+    badge1:'先着10名・価格据え置き', badge2:'毎月ビート追加', badge3:'日本語サポート',
+    reasons_eyebrow:'WHY US', reasons_title:'選ばれる3つの理由',
+    reasons_lead:'海外大手が「分かりにくい・シーンに合わない・相談できない」なら、その逆をやる。',
+    card1_h:'ぜんぶ分かりやすい', card1_p:'ライセンスも使い方も明快。困ったら直接相談OK。',
+    card2_h:'使い放題', card2_p:'会員期間中は何曲でもDL。月額の定額で好きなだけ。',
+    card3_h:'商用利用OK', card3_p:'配信・ライブ・動画に使える。あなたの曲として世に出せる。',
+    join_eyebrow:'MEMBERSHIP', join_title:'創設メンバー募集',
+    join_lead:'先着10名。今後値上げしても、この価格のまま据え置き。要望は直接反映します。',
+    price_tag:'創設メンバー価格', price_per:'／月',
+    feats:['毎月追加されるビートを使い放題','商用利用OK（配信・ライブ・動画）','要望・リクエストを直接反映','いつでも解約OK'],
+    price_btn:'Stripeで登録する', price_btn_app:'Webで登録する',
+    price_note:'安全な決済（Stripe）・登録後すぐ会員画面へ', price_note_app:'登録は安全なWebページ（Safari）で行います',
+    member_eyebrow:'LIBRARY', member_title:'ビートライブラリ', member_lead:'会員だけの部屋。ログイン中はダウンロードが開きます。',
+    email_ph:'登録したメールアドレス', login_btn:'ログイン',
+    search_ph:'ビートを検索（曲名・ジャンル・タグ・キー）',
+    app_note:'※「創設メンバーになる」を押すと、登録用の外部サイト（Safari）が開きます',
+    nav_login:'ログイン', nav_logout:'ログアウト',
+    status_in:(e)=>'<span class="dot"></span>ログイン中 — <b>'+e+'</b>',
+    status_out:'<span class="dot"></span>未ログイン — DLはロック中',
+    dl_member:'ダウンロード', dl_locked:'会員限定', preview_ok:'7秒試聴OK',
+    empty:'ただいまビートを準備中です。近日公開。', noresult:'該当するビートがありません。',
+    all_label:'すべて', prod_label:'Produced by', detail_head:'BEAT',
+    dl_note_member:'会員はフル尺をダウンロードできます', dl_note_guest:'試聴は7秒。ダウンロードは会員限定です。',
+    faq:[['ダウンロードしたビートは商用利用できますか？','はい。会員期間中にDLしたビートは配信・ライブ・動画などに使えます（規約の範囲内）。'],
+         ['ビートは毎月増えますか？','はい。毎月オリジナルビートを追加します。会員はすべて使い放題です。'],
+         ['解約はできますか？','いつでも解約できます。創設メンバーの据え置き価格は継続中ずっと有効です。']],
+    faq_eyebrow:'FAQ', faq_title:'よくある質問',
+    tokusho:'特定商取引法に基づく表記', langlabel:'EN'
+  },
+  en: {
+    badge:'Made for the scene · Commercial use OK',
+    hero_h1:'Unlimited beats,<br><span>ready for your track.</span>',
+    hero_p:'Fresh original beats every month, downloadable by members only. Stop buying one at a time — get them all, one monthly price.',
+    cta_join:'Become a founding member', cta_view:'Listen to beats',
+    badge1:'First 10 · price locked', badge2:'New beats monthly', badge3:'Real human support',
+    reasons_eyebrow:'WHY US', reasons_title:'Why producers choose us',
+    reasons_lead:'Everything the big marketplaces make hard — clear terms, a real catalog, real support — made simple.',
+    card1_h:'Clear & simple', card1_p:'Licensing and usage made clear. Ask us anything, anytime.',
+    card2_h:'Unlimited', card2_p:'Download as many as you want while you are a member. One flat monthly price.',
+    card3_h:'Commercial use OK', card3_p:'Use them for streaming, shows, and videos. Release them as your own.',
+    join_eyebrow:'MEMBERSHIP', join_title:'Founding members',
+    join_lead:'First 10 members only. Your price stays locked even if we raise it later. We build around your requests.',
+    price_tag:'Founding price', price_per:'/mo',
+    feats:['Unlimited access to new monthly beats','Commercial use (streaming, shows, video)','Your requests shape the catalog','Cancel anytime'],
+    price_btn:'Join with Stripe', price_btn_app:'Sign up on the web',
+    price_note:'Secure checkout by Stripe · instant access', price_note_app:'Sign up on a secure web page (Safari)',
+    member_eyebrow:'LIBRARY', member_title:'Beat library', member_lead:'Members only. Downloads unlock when you are signed in.',
+    email_ph:'Your registered email', login_btn:'Sign in',
+    search_ph:'Search beats (title, genre, tag, key)',
+    app_note:'Tapping “Become a founding member” opens our website in your browser.',
+    nav_login:'Sign in', nav_logout:'Sign out',
+    status_in:(e)=>'<span class="dot"></span>Signed in — <b>'+e+'</b>',
+    status_out:'<span class="dot"></span>Not signed in — downloads locked',
+    dl_member:'Download', dl_locked:'Members', preview_ok:'7-sec preview',
+    empty:'Beats are being prepared. Coming soon.', noresult:'No beats match your search.',
+    all_label:'All', prod_label:'Produced by', detail_head:'BEAT',
+    dl_note_member:'Members can download the full track', dl_note_guest:'Preview is 7 sec. Download is members only.',
+    faq:[['Can I use downloaded beats commercially?','Yes. Beats you download while a member can be used for streaming, shows, and videos (per the terms).'],
+         ['Do you add beats every month?','Yes. We add original beats every month, all unlimited for members.'],
+         ['Can I cancel?','Anytime. Founding-member pricing stays locked as long as you keep your membership.']],
+    faq_eyebrow:'FAQ', faq_title:'Frequently asked',
+    tokusho:'特定商取引法に基づく表記 (Japanese legal notice)', langlabel:'日本語'
+  }
+};
+let LANG = (navigator.language||'').toLowerCase().startsWith('ja') ? 'ja' : 'en';
+let ME = {member:false, email:null};
+let PRICE_DISPLAY = '';
+function t(){ return I18N[LANG]; }
+
+function applyI18n(){
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const v=t()[el.getAttribute('data-i18n')]; if(typeof v==='string') el.textContent=v; });
+  document.querySelectorAll('[data-icon]').forEach(el=>{ el.innerHTML=icon(el.getAttribute('data-icon')); });
+  document.getElementById('heroChip').innerHTML = icon('sparkles')+'<span>'+t().badge+'</span>';
+  document.getElementById('heroH1').innerHTML = t().hero_h1;
+  document.getElementById('email').placeholder = t().email_ph;
+  document.getElementById('search').placeholder = t().search_ph;
+  document.getElementById('searchIcon').innerHTML = icon('search');
+  document.getElementById('searchClr').innerHTML = icon('x');
+  document.getElementById('langBtn').textContent = t().langlabel;
+  document.getElementById('tokushoLink').textContent = t().tokusho;
+  document.getElementById('dBack').innerHTML = icon('back');
+  document.getElementById('dHeadTitle').textContent = t().detail_head;
+  document.getElementById('featlist').innerHTML = t().feats.map(f=>'<li><span class="ck">'+icon('check')+'</span><span>'+f+'</span></li>').join('');
+  document.querySelector('#joinbtn span').textContent = IS_APP ? t().price_btn_app : t().price_btn;
+  document.querySelector('#join .note').textContent = IS_APP ? t().price_note_app : t().price_note;
+  if(PRICE_DISPLAY) document.getElementById('priceAmt').textContent = PRICE_DISPLAY;
+  document.getElementById('faq').innerHTML = t().faq.map(([q,a])=>`<details><summary><span>${q}</span><span class="pm">${icon('plus')}</span></summary><p>${a}</p></details>`).join('');
+  renderAuth(); loadBeats(); if(DETAIL) renderDetail();
+}
+function toggleLang(){ LANG = LANG==='ja'?'en':'ja'; applyI18n(); }
+
+function renderAuth(){
+  document.body.classList.toggle('is-member', !!ME.member);
+  const nav=document.getElementById('navauth'), st=document.getElementById('statusText'), row=document.getElementById('loginrow');
+  if(ME.member){
+    nav.innerHTML = '<a class="btn-ghost" href="/logout">'+icon('logout')+'<span>'+t().nav_logout+'</span></a>';
+    st.classList.add('in'); st.innerHTML = t().status_in(ME.email||''); row.style.display='none';
+  } else {
+    nav.innerHTML = '<button class="btn-ghost" onclick="go(\'member\')"><span>'+t().nav_login+'</span></button>';
+    st.classList.remove('in'); st.innerHTML = t().status_out; row.style.display='flex';
+  }
+}
+
+/* ---------- catalog + search + filter ---------- */
+let CATALOG=[]; let TYPE_FILTER=null; let QUERY=''; let CURRENT=null; let DETAIL=null;
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function beatById(id){ return CATALOG.find(b=>b.id===id); }
+function artFor(b){
+  let h=0; const s=String((b&&b.id)||(b&&b.title)||'x'); for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0;
+  const a=h%360, b2=(a+42)%360;
+  return 'linear-gradient(135deg,hsl('+a+' 55% 30%),hsl('+b2+' 60% 16%))';
+}
+async function loadBeats(){
+  try{ CATALOG=await (await fetch('/api/catalog')).json(); }catch(e){ CATALOG=[]; }
+  if(TYPE_FILTER && !CATALOG.some(b=>b.type_beat===TYPE_FILTER)) TYPE_FILTER=null;
+  renderPlaylists(); renderBeatList();
+}
+function typeCounts(){
+  const m=new Map();
+  CATALOG.forEach(b=>{ if(b.type_beat){ m.set(b.type_beat,(m.get(b.type_beat)||0)+1); } });
+  return [...m.entries()].sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0]));
+}
+function visibleBeats(){
+  let arr = TYPE_FILTER===null ? CATALOG.slice() : CATALOG.filter(b=>b.type_beat===TYPE_FILTER);
+  if(QUERY){
+    const q=QUERY.toLowerCase();
+    arr = arr.filter(b=>[b.title,b.genre,b.key,b.type_beat].filter(Boolean).some(v=>String(v).toLowerCase().includes(q)));
+  }
+  return arr;
+}
+function onSearch(v){ QUERY=v.trim(); document.getElementById('searchClr').classList.toggle('show',!!QUERY); renderBeatList(); }
+function clearSearch(){ QUERY=''; const s=document.getElementById('search'); s.value=''; document.getElementById('searchClr').classList.remove('show'); renderBeatList(); s.focus(); }
+function renderPlaylists(){
+  const el=document.getElementById('playlists'); if(!el) return;
+  const counts=typeCounts();
+  if(!counts.length){ el.innerHTML=''; return; }
+  let html='<div class="pl'+(TYPE_FILTER===null?' active':'')+'" data-type="">'+t().all_label+' <small>'+CATALOG.length+'</small></div>';
+  html+=counts.map(([name,n])=>'<div class="pl'+(TYPE_FILTER===name?' active':'')+'" data-type="'+esc(name)+'">'+esc(name)+' <small>'+n+'</small></div>').join('');
+  el.innerHTML=html;
+  el.onclick=e=>{ const c=e.target.closest('.pl'); if(!c)return; const ty=c.getAttribute('data-type'); TYPE_FILTER=ty===''?null:ty; renderPlaylists(); renderBeatList(); };
+}
+function metaLine(b){ return [b.genre,b.bpm?b.bpm+' BPM':'',b.key].filter(Boolean).join(' · '); }
+function renderBeatList(){
+  const list=document.getElementById('beatlist');
+  const beats = visibleBeats();
+  if(!beats.length){ list.innerHTML='<div class="emptybeats">'+icon(QUERY?'search':'music')+'　'+(QUERY?t().noresult:t().empty)+'</div>'; return; }
+  list.innerHTML = beats.map(b=>{
+    const tb=b.type_beat?('<span class="tb"> · '+esc(b.type_beat)+' type</span>'):'';
+    const prev=ME.member?'':(' · <span class="prev">'+t().preview_ok+'</span>');
+    const on = (CURRENT===b.id) ? ' playing':'';
+    const rowon = (CURRENT===b.id) ? ' active':'';
+    return `<div class="beatrow${rowon}" onclick="openDetail('${b.id}')">
+      <div class="art${on}" style="background:${artFor(b)}" onclick="event.stopPropagation();toggleBeat('${b.id}')">
+        <span class="pic">${icon('music')}</span>
+        <button class="ov">${icon(on?'pause':'play')}</button>
+      </div>
+      <div class="beatmeta">
+        <b>${esc(b.title)}</b>
+        <div class="sub">${metaLine(b)}${tb}${prev}</div>
+      </div>
+      <div class="rowbtns">
+        <button class="dl ${ME.member?'':'locked'}" onclick="event.stopPropagation();download('${b.id}')">${ME.member?icon('download'):icon('lock')}<span class="lbl">${ME.member?t().dl_member:t().dl_locked}</span></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- audio engine + player bar ---------- */
+const AU = () => document.getElementById('player');
+function srcFor(id){ return (ME.member?'/api/stream/':'/api/preview/')+id; }
+function fmt(s){ if(!isFinite(s)||s<0)s=0; const m=Math.floor(s/60), ss=Math.floor(s%60); return m+':'+(ss<10?'0':'')+ss; }
+function loadTrack(id){
+  const b=beatById(id); if(!b) return;
+  CURRENT=id; const au=AU();
+  au.src=srcFor(id); au.play().catch(()=>{});
+  document.body.classList.add('has-player');
+  renderPlayerBar(); renderBeatList(); if(DETAIL) renderDetail();
+}
+function toggleBeat(id){ if(CURRENT===id){ togglePlay(); } else { loadTrack(id); } }
+function togglePlay(){ const au=AU(); if(!CURRENT) return; if(au.paused) au.play().catch(()=>{}); else au.pause(); }
+function renderPlayerBar(){
+  const b=beatById(CURRENT); if(!b) return;
+  document.getElementById('pbArt').style.background=artFor(b);
+  document.getElementById('pbArtPic').innerHTML=icon('music');
+  document.getElementById('pbTitle').textContent=b.title;
+  document.getElementById('pbSub').textContent=metaLine(b);
+  updatePlayIcons();
+}
+function updatePlayIcons(){
+  const paused=AU().paused;
+  document.getElementById('pbPlay').innerHTML=icon(paused?'play':'pause');
+  const dp=document.getElementById('dPlay'); if(dp) dp.innerHTML=icon((paused||DETAIL!==CURRENT)?'play':'pause');
+  document.querySelectorAll('.art').forEach(a=>{}); // row icons handled on re-render
+  renderBeatList();
+}
+function seekAt(e){
+  const au=AU(); if(!au.duration) return;
+  const el=e.currentTarget; const r=el.getBoundingClientRect();
+  const ratio=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));
+  au.currentTime=ratio*au.duration;
+}
+function onTime(){
+  const au=AU(); const d=au.duration||0; const c=au.currentTime||0; const ratio=d?c/d:0;
+  document.getElementById('seekFill').style.width=(ratio*100)+'%';
+  document.getElementById('pbTime').textContent=fmt(c);
+  if(DETAIL===CURRENT){
+    document.getElementById('dCur').textContent=fmt(c);
+    document.getElementById('dDur').textContent=fmt(d);
+    const bars=document.querySelectorAll('#wave .bar'); const cut=Math.floor(ratio*bars.length);
+    bars.forEach((bar,i)=>bar.classList.toggle('on',i<=cut));
+  }
+}
+
+/* ---------- track detail ---------- */
+function waveHeights(id){
+  let h=0; const s=String(id); for(let i=0;i<s.length;i++) h=(h*131+s.charCodeAt(i))>>>0;
+  const out=[]; for(let i=0;i<56;i++){ h=(h*1103515245+12345)&0x7fffffff; out.push(24+(h%76)); } return out;
+}
+function openDetail(id){
+  if(!id) return; DETAIL=id; renderDetail();
+  const d=document.getElementById('detail'); d.classList.add('open'); d.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+function closeDetail(){
+  const d=document.getElementById('detail'); d.classList.remove('open'); d.setAttribute('aria-hidden','true');
+  document.body.style.overflow=''; DETAIL=null;
+}
+function renderDetail(){
+  const b=beatById(DETAIL); if(!b) return;
+  document.getElementById('dArt').style.background=artFor(b);
+  document.getElementById('dArtPic').innerHTML=icon('music');
+  document.getElementById('dTitle').textContent=b.title;
+  document.getElementById('dProd').textContent = b.uploader ? (t().prod_label+' '+b.uploader) : 'L RAP LEGACY';
+  const tags=[]; if(b.type_beat) tags.push('<span class="dtag accent">'+esc(b.type_beat)+' type</span>');
+  if(b.genre) tags.push('<span class="dtag">'+esc(b.genre)+'</span>');
+  if(b.bpm) tags.push('<span class="dtag">'+b.bpm+' BPM</span>');
+  if(b.key) tags.push('<span class="dtag">'+esc(b.key)+'</span>');
+  document.getElementById('dTags').innerHTML=tags.join('');
+  document.getElementById('wave').innerHTML=waveHeights(b.id).map(h=>'<div class="bar" style="height:'+h+'%"></div>').join('');
+  document.getElementById('dDl').innerHTML=(ME.member?icon('download'):icon('lock'))+'<span class="lbl">'+(ME.member?t().dl_member:t().dl_locked)+'</span>';
+  document.getElementById('dDl').className='dl '+(ME.member?'':'locked');
+  document.getElementById('dNote').textContent = ME.member ? t().dl_note_member : t().dl_note_guest;
+  document.getElementById('dCur').textContent = (DETAIL===CURRENT)?fmt(AU().currentTime):'0:00';
+  document.getElementById('dDur').textContent = (DETAIL===CURRENT)?fmt(AU().duration):'0:00';
+  updatePlayIcons(); onTime();
+}
+function detailPlay(){ if(!DETAIL) return; if(CURRENT===DETAIL){ togglePlay(); } else { loadTrack(DETAIL); } }
+
+/* ---------- actions ---------- */
+async function join(){
+  if(IS_APP){ const url=location.origin+'/'; if(openExternal(url)) return; location.href=url; return; }
+  const btn=document.getElementById('joinbtn'); if(btn){btn.disabled=true;}
+  try{ const r=await (await fetch('/api/checkout',{method:'POST'})).json(); if(r.url) location.href=r.url; else alert(r.error||'error'); }
+  catch(e){ alert('network error'); }
+  if(btn){btn.disabled=false;}
+}
+async function login(){
+  const email=document.getElementById('email').value;
+  const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+  const d=await r.json(); if(r.ok) init(); else alert(d.error||'error');
+}
+function download(id){ if(!ME.member){ closeDetail(); go('member'); return; } location.href='/api/download/'+id; }
+function go(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+
+async function init(){
+  try{ const cfg=await (await fetch('/api/config')).json(); PRICE_DISPLAY=cfg.priceDisplay||''; }catch(e){}
+  try{ ME=await (await fetch('/api/me')).json(); }catch(e){}
+  applyI18n();
+  if(!IS_APP && new URLSearchParams(location.search).get('checkout')==='1' && !ME.member){ setTimeout(join,300); }
+}
+// audio events
+window.addEventListener('DOMContentLoaded',()=>{
+  const au=AU();
+  au.addEventListener('timeupdate',onTime);
+  au.addEventListener('play',updatePlayIcons);
+  au.addEventListener('pause',updatePlayIcons);
+  au.addEventListener('loadedmetadata',onTime);
+  au.addEventListener('ended',()=>{ // autoplay next in current view
+    const list=visibleBeats(); const i=list.findIndex(b=>b.id===CURRENT);
+    if(i>=0 && i<list.length-1){ loadTrack(list[i+1].id); } else { updatePlayIcons(); }
+  });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && DETAIL) closeDetail(); });
+});
+init();
+</script>
+</body>
+</html>
