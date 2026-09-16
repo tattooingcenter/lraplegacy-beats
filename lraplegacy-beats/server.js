@@ -25,6 +25,10 @@ const PRICES = {
           name: 'L RAP LEGACY BEATS — Membership', desc: 'Unlimited beats. Monthly membership. Commercial use OK.' },
 };
 const DEV_FAKE = process.env.DEV_FAKE_STRIPE === '1';
+// App Review（審査）用の特別ログイン。Renderの環境変数 REVIEW_EMAILS にカンマ区切りで設定。
+// 例) REVIEW_EMAILS=appreview@lraplegacy.jp → そのメールはStripe無しでも会員扱い（審査担当が中身を確認できる）。
+// コードには値を書かない（公開リポジトリのため）。審査通過後に環境変数を消せば無効化できる。
+const REVIEW_EMAILS = (process.env.REVIEW_EMAILS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 const stripe = SECRET ? require('stripe')(SECRET, { apiVersion: '2025-03-31.basil' }) : null;
 
 const UPLOAD_PASSWORD = process.env.UPLOAD_PASSWORD || '';
@@ -156,6 +160,7 @@ function regionFromReq(req) {
 }
 async function hasActiveSub(email) {
   if (DEV_FAKE) return true;
+  if (email && REVIEW_EMAILS.includes(email.toLowerCase())) return true; // App Review 用
   const customers = await stripe.customers.list({ email, limit: 10 });
   for (const c of customers.data) {
     for (const st of ['active', 'trialing']) {
@@ -303,6 +308,11 @@ app.get('/api/pending-preview/:id', async (req, res) => {
   return res.sendFile(path.join(DATA_DIR, 'previews', `${b.id}.mp3`));
 });
 
+// App(リーダー)モード: ?app=1 のトップは、課金コードを一切含まないリーダー専用ページを返す。
+app.get('/', (req, res, next) => {
+  if ('app' in req.query) return res.sendFile(path.join(__dirname, 'public', 'reader.html'));
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
